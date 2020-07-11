@@ -3,6 +3,7 @@
 //=================================
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const consoleTable = require("console.table");
 
 
 //=================================
@@ -31,7 +32,7 @@ const mainPrompt = {
     name: "mainOptions",
     type: "list",
     message: "What would you like to do?",
-    choices: ["Add Employee", "View All Employees", "View All Department", "View All Roles","Remove Employee", "Update Employee Role", "Update Employee Manager", "Add Role", "Add Department","EXIT"]
+    choices: ["Add Employee", "View All Employees", "View All Department", "View All Roles","Remove Employee", "Update Employee Role", "Update Employee Manager", "Add Role", "Add Department","Update Employee Roles","EXIT"]
 
 }
 
@@ -75,6 +76,9 @@ function start() {
                     break;
                 case "Add Role":
                     return addRole();
+                    break;
+                case "Update Employee Role":
+                    return updateEmployeeRole();
                     break;
                 default:
                     connection.end();
@@ -190,6 +194,7 @@ function addDepartment() {
 function addRole() {
 
     connection.query("SELECT * FROM department", function (err, res) {
+        if (err) throw err;
         console.log(err, res);
         const departmentNames = [];
         for (let i = 0; i < res.length; i++) {
@@ -270,6 +275,8 @@ function viewAllRoles(tables) {
 function viewAllEmployees() {
     console.log("you chose to View All Employees!");
 
+
+
     connection.query("SELECT * FROM employee", function (err, data) {
         if (err) throw err;
         console.table(data)
@@ -278,7 +285,111 @@ function viewAllEmployees() {
 
 }
 
+function updateEmployeeRole() {
+   
 
+
+    connection.query("SELECT DISTINCT employee.id, first_name, last_name, title, role_id FROM employee LEFT JOIN role on employee.id = role.id;", function (err, data) {
+        if (err) throw err;
+        console.log("this is the roles", data)
+
+        var arrayEmployees = [];
+        for (let i = 0; i < data.length; i++){
+            arrayEmployees.push(data[i].first_name + " " + data[i].last_name)
+        }
+        console.log(arrayEmployees);
+
+       
+
+        inquirer.prompt([
+            {
+                name: "update",
+                type: "list",
+                message: "Choose an employee from the list?",
+                choices: arrayEmployees
+                
+            },
+           
+
+        ]).then(function (answer) {
+            console.log(answer)
+
+
+            connection.query("SELECT * FROM role", function (err, data) {
+                if (err) throw err;
+                console.log(data)
+
+
+
+                const arrayRoles = [];
+                for (let i = 0; i < data.length; i++) {
+                    arrayRoles.push(data[i].title)
+
+                };
+
+                // inquirer.prompt({
+
+                //     name: "roles",
+                //     type: "list",
+                //     message: "Choose new role?",
+                //     choices: arrayRoles
+
+                // }).then(function (answer) {
+                  
+                //     connection.query("UPDATE INTO role SET ? WHERE  ?",
+                //         {
+                //             title: answer.roles
+                //         },
+                //         {
+                //             id: data.id
+
+                //         }, function (err) {
+                //         if (err) throw err;
+                        
+                //     })
+
+
+
+                // })
+
+
+
+
+
+
+
+
+
+            })
+      
+
+
+
+
+            
+           
+
+
+            
+        })
+
+
+
+
+
+    })
+    
+    // connection.query("SELECT  first_name, last_name, role_id FROM employee", function (err, data) {
+    //     console.log(data);
+
+    //     console.table(data)
+        
+        
+    // })
+
+
+
+}
 
 
 
