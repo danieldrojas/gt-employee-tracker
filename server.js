@@ -42,9 +42,8 @@ const mainPrompt = {
 connection.connect(function (err, res) {
     if (err) throw err;
     console.log("Connected as id " + connection.threadId + "\n");
-    console.log("This is just an obj of the actually connection the response from the query connection")
-    console.log("=======================================");
-    console.log(res)
+
+
 
     start();
  
@@ -93,17 +92,14 @@ function start() {
 //=======================================
 //Add a new employee to database
 function addEmployee() {
-    console.log("you chose to add employee!");
     
 
     connection.query("SELECT * FROM role", function (err, data) {
-        console.log(data)
         var roleTitles = [];
         for (var i = 0; i < data.length; i++){
             roleTitles.push(data[i].title)
             
         }
-        console.log(roleTitles);   
 
         const addEmployeePrompt = [{
 
@@ -125,19 +121,13 @@ function addEmployee() {
             choices: roleTitles
 
         },
-        // {
-        //     name: "managerId",
-        //     type: "input",
-        //     message: "Enter manager ID number?",
-
-        // }
+      
         ]
 
 
     inquirer
         .prompt(addEmployeePrompt)
         .then(function (answer) {
-            console.log('answerssss', answer)
             
             var roleId;
 
@@ -146,25 +136,7 @@ function addEmployee() {
                     roleId = data[i].id;
                 }
             }
-            console.log('this is our orle id to save!!!', roleId)
-
-            // connection.query(
-            //     "INSERT INTO employee SET ?",
-            //     {
-            //         first_name: answer.firstName,
-            //         last_name: answer.lastName,
-            //         role_id: answer.roleId,
-            //         manager_id: answer.managerId
-            //     },
-       
-            //     function (err) {
-            //         if (err) throw err;
-            //         console.log("Employee added")
-            //         connection.end(); //after adding ends the connection
-            //         // tableData("employee");
-
-            //     });
-            
+            connection.end
             
        
         });
@@ -185,7 +157,6 @@ function addDepartment() {
             },
             function (err) {
                 if (err) throw err;
-                console.log("you added a new department");
             
 
             });
@@ -195,12 +166,10 @@ function addRole() {
 
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
-        console.log(err, res);
         const departmentNames = [];
         for (let i = 0; i < res.length; i++) {
             departmentNames.push(res[i].name);
         };
-        console.log(departmentNames)
     
         inquirer.prompt([
             {
@@ -221,7 +190,6 @@ function addRole() {
                 choices: departmentNames
 
             }]).then(function (answer) {
-                console.log(answer)
 
                 var departmentId;
 
@@ -230,7 +198,6 @@ function addRole() {
                         departmentId = res[i].id;
                     }
                 }
-                console.log("this are depart ids", departmentId);
 
 
                 connection.query("INSERT INTO role SET ?",
@@ -242,7 +209,6 @@ function addRole() {
                     },
                     function (err) {
                         if (err) throw err;
-                        console.log("you added a new role");
 
 
                     });
@@ -266,14 +232,12 @@ function viewAllRoles(tables) {
 
     connection.query("SELECT * FROM role", function (err, data) {
         if (err) throw err;
-        console.table(data)
         connection.end();
     })
 
 }
 
 function viewAllEmployees() {
-    console.log("you chose to View All Employees!");
 
 
 
@@ -291,13 +255,11 @@ function updateEmployeeRole() {
 
     connection.query("SELECT DISTINCT employee.id, first_name, last_name, title, role_id FROM employee LEFT JOIN role on employee.id = role.id;", function (err, data) {
         if (err) throw err;
-        console.log("this is the roles", data)
 
         var arrayEmployees = [];
         for (let i = 0; i < data.length; i++){
             arrayEmployees.push(data[i].first_name + " " + data[i].last_name)
         }
-        console.log(arrayEmployees);
 
        
 
@@ -312,12 +274,10 @@ function updateEmployeeRole() {
            
 
         ]).then(function (answer) {
-            console.log(answer)
 
 
             connection.query("SELECT * FROM role", function (err, data) {
                 if (err) throw err;
-                console.log(data)
 
 
 
