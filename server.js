@@ -94,7 +94,7 @@ function addEmployee() {
 
     connection.query("SELECT * FROM role", function (err, data) {
         var roleTitles = [];
-        for (var i = 0; i < data.length; i++){
+        for (var i = 0; i < data.length; i++) {
             roleTitles.push(data[i].title)
             
         }
@@ -121,24 +121,39 @@ function addEmployee() {
         },
       
         ]
-
-
-    inquirer
-        .prompt(addEmployeePrompt)
-        .then(function (answer) {
+        inquirer
+            .prompt(addEmployeePrompt)
+            .then(function (answer) {
             
-            var roleId;
+              let roleId;
 
-            for (var i = 0; i < data.length; i++) {
-                if (answer.roleId === data[i].title) {
-                    roleId = data[i].id;
+                for (let i = 0; i < data.length; i++) {
+                    if (answer.roleId === data[i].title) {
+                        roleId = data[i].id;
+                    }
                 }
-            }
-            connection.end
             
-       
-        });
-    })
+                connection.query("INSERT INTO employee SET ?",
+                        {
+                            first_name: answer.firstName,                     
+                            last_name: answer.lastName,                       
+                            role_id: roleId
+
+                        }
+                        ), function (err) {
+                            if (err) throw err;
+
+                        }
+                start();
+
+
+                });
+        
+            });
+            
+
+  
+  
 }
 
 function addDepartment() {
@@ -155,15 +170,18 @@ function addDepartment() {
             },
             function (err) {
                 if (err) throw err;
+                start()
+
             
 
             });
     });
-};
+}
 
 function addRole() {
 
     connection.query("SELECT * FROM department", function (err, res) {
+
         if (err) throw err;
         const departmentNames = [];
         for (let i = 0; i < res.length; i++) {
@@ -208,6 +226,8 @@ function addRole() {
                     },
                     function (err) {
                         if (err) throw err;
+                        start()
+
 
 
                     });
@@ -222,7 +242,7 @@ function viewAllDepartment() {
     connection.query("SELECT * FROM department", function (err, data) {
         if (err) throw err;
         console.table(data)
-        connection.end();
+        start()
     })
 
 }
@@ -230,9 +250,11 @@ function viewAllDepartment() {
 function viewAllRoles(tables) {
 
 
-    connection.query("SELECT * FROM role", function (err, data) {
+    connection.query("SELECT DISTINCT title FROM role", function (err, data) {
         if (err) throw err;
-        connection.end();
+      
+        console.table(data)
+        start()
     })
 
 }
@@ -244,7 +266,7 @@ function viewAllEmployees() {
     connection.query("SELECT * FROM employee", function (err, data) {
         if (err) throw err;
         console.table(data)
-        connection.end();
+        start()
     })
 
 }
@@ -275,11 +297,8 @@ function updateEmployeeRole() {
 
         ]).then(function (employeeAnswer) {
 
-
             connection.query("SELECT * FROM role", function (err, data) {
                 if (err) throw err;
-
-
 
                 const arrayRoles = [];
                 for (let i = 0; i < data.length; i++) {
@@ -296,12 +315,7 @@ function updateEmployeeRole() {
 
                 }).then(function (answer) {
                 
-                    // connection.query('SELECT * FROM role', function (err,res) { 
-                    //     console.log('connect beging good', err, res)
-                    // })
                     
-                    console.log(' role data ------------------', data)
-                    console.log('answers $$$$$$$$$$$$$$$$$$$$$', answer)
 
                     var newRoleId;
                     for (var i = 0; i < data.length; i++){
@@ -313,11 +327,7 @@ function updateEmployeeRole() {
                         }
                         
                     }
-                    //console.log("this is the role id: ", newRoleId);
-
-
-                   // console.log('emplemployeeData *******************', employeeData)
-                    //console.log('employeeAnswer !!!!!!!!!!!!!!!!!!!', employeeAnswer);
+                    
                     var employeeId;
                     for (var i = 0; i < employeeData.length; i++){
                        // console.log('name found match!!', employeeAnswer.update.indexOf(employeeData[i].first_name), ' this is the dude we compared', employeeData[i].first_name)
@@ -375,20 +385,19 @@ function updateEmployeeRole() {
 
 }
 
-//test function  
-function tableData(tableName) {
-    connection.query(
-        "SELECT * FROM " + tableName,
-        function (err, data) {
-            console.log("this is the current data base")
-            console.table(data)
+// function tableData(tableName) {
+//     connection.query(
+//         "SELECT * FROM " + tableName,
+//         function (err, data) {
+//             console.log("this is the current data base")
+//             console.table(data)
 
-            connection.end();
+//             connection.end();
 
-        }
+//         }
 
-    )
-}
+//     )
+// }
 
 
 
