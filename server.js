@@ -62,6 +62,9 @@ function start() {
                 case "View All Employees":
                     return viewAllEmployees();
                     break;
+                case "Remove Employee":
+                    return removeEmployee();
+                    break;
                 case "Add Department":
                     return addDepartment();
                     break;
@@ -149,12 +152,8 @@ function addEmployee() {
 
                 });
         
-            });
-            
-
-  
-  
-}
+            }); 
+};
 
 function addDepartment() {
     inquirer.prompt({
@@ -262,8 +261,7 @@ function viewAllRoles(tables) {
 function viewAllEmployees() {
 
 
-
-    connection.query("SELECT * FROM employee", function (err, data) {
+    connection.query("SELECT first_name, last_name, title, salary FROM employee LEFT JOIN role ON employee.role_id = role.id " , function (err, data) {
         if (err) throw err;
         console.table(data)
         start()
@@ -385,21 +383,47 @@ function updateEmployeeRole() {
 
 }
 
-// function tableData(tableName) {
-//     connection.query(
-//         "SELECT * FROM " + tableName,
-//         function (err, data) {
-//             console.log("this is the current data base")
-//             console.table(data)
+function removeEmployee() {
 
-//             connection.end();
+    connection.query("SELECT * FROM employee", function (err, employeeData) {
+    var arrayEmployees = [];
+    for (let i = 0; i < employeeData.length; i++) {
+        arrayEmployees.push(employeeData[i].first_name + " " + employeeData[i].last_name)
+    }
+ 
 
-//         }
+    inquirer
+        .prompt({
+            name: "employee",
+            type: "list",
+            message: "Choose employee to be deleted",
+            choices: arrayEmployees
+            
+        }).then(function (employeeAnswer) {
 
-//     )
-// }
+            var employeeId;
+            for (var i = 0; i < employeeData.length; i++) {
+                // console.log('name found match!!', employeeAnswer.update.indexOf(employeeData[i].first_name), ' this is the dude we compared', employeeData[i].first_name)
+                if (employeeAnswer.employee.indexOf(employeeData[i].first_name) === 0) {
+                    //console.log("we find a match", employeeData[i])
+                    employeeId = employeeData[i].id;
+                }
+            }
+            connection.query("DELETE FROM employee WHERE ?",
+                {
+                    id: employeeId
 
+                }, function (err) {
+                    if (err) throw err;
+                    console.log(`You deleted ${employeeAnswer.employee}`);
+                    start();
+            })
 
+        
+        })
+    })
+    
+}
 
 
 
