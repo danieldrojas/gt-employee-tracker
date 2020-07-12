@@ -36,8 +36,6 @@ const mainPrompt = {
 
 }
 
-
-
 //Connection to the database
 connection.connect(function (err, res) {
     if (err) throw err;
@@ -162,6 +160,7 @@ function addDepartment() {
             });
     });
 };
+
 function addRole() {
 
     connection.query("SELECT * FROM department", function (err, res) {
@@ -227,6 +226,7 @@ function viewAllDepartment() {
     })
 
 }
+
 function viewAllRoles(tables) {
 
 
@@ -253,12 +253,12 @@ function updateEmployeeRole() {
    
 
 
-    connection.query("SELECT DISTINCT employee.id, first_name, last_name, title, role_id FROM employee LEFT JOIN role on employee.id = role.id;", function (err, data) {
+    connection.query("SELECT DISTINCT employee.id, first_name, last_name, title, role_id FROM employee LEFT JOIN role on employee.id = role.id;", function (err, employeeData) {
         if (err) throw err;
 
         var arrayEmployees = [];
-        for (let i = 0; i < data.length; i++){
-            arrayEmployees.push(data[i].first_name + " " + data[i].last_name)
+        for (let i = 0; i < employeeData.length; i++){
+            arrayEmployees.push(employeeData[i].first_name + " " + employeeData[i].last_name)
         }
 
        
@@ -273,7 +273,7 @@ function updateEmployeeRole() {
             },
            
 
-        ]).then(function (answer) {
+        ]).then(function (employeeAnswer) {
 
 
             connection.query("SELECT * FROM role", function (err, data) {
@@ -287,38 +287,62 @@ function updateEmployeeRole() {
 
                 };
 
-                // inquirer.prompt({
+                inquirer.prompt({
 
-                //     name: "roles",
-                //     type: "list",
-                //     message: "Choose new role?",
-                //     choices: arrayRoles
+                    name: "roles",
+                    type: "list",
+                    message: "Choose new role?",
+                    choices: arrayRoles
 
-                // }).then(function (answer) {
-                  
-                //     connection.query("UPDATE INTO role SET ? WHERE  ?",
-                //         {
-                //             title: answer.roles
-                //         },
-                //         {
-                //             id: data.id
+                }).then(function (answer) {
+                
+                    // connection.query('SELECT * FROM role', function (err,res) { 
+                    //     console.log('connect beging good', err, res)
+                    // })
+                    
+                    console.log(' role data ------------------', data)
+                    console.log('answers $$$$$$$$$$$$$$$$$$$$$', answer)
 
-                //         }, function (err) {
-                //         if (err) throw err;
+                    var newRoleId;
+                    for (var i = 0; i < data.length; i++){
+                        console.log('looping!!')
+                        if (data[i].title === answer.roles) {
+                            newRoleId = data[i].id;
+                            break;
+                            //return;
+                        }
                         
-                //     })
+                    }
+                    //console.log("this is the role id: ", newRoleId);
 
 
+                   // console.log('emplemployeeData *******************', employeeData)
+                    //console.log('employeeAnswer !!!!!!!!!!!!!!!!!!!', employeeAnswer);
+                    var employeeId;
+                    for (var i = 0; i < employeeData.length; i++){
+                       // console.log('name found match!!', employeeAnswer.update.indexOf(employeeData[i].first_name), ' this is the dude we compared', employeeData[i].first_name)
+                        if (employeeAnswer.update.indexOf(employeeData[i].first_name) === 0) {
+                            //console.log("we find a match", employeeData[i])
+                            employeeId = employeeData[i].id;
+                        }
+                    }
 
-                // })
+                    //console.log("this is e,mploy id", employeeId);
 
+                    //"UPDATE employee SET role_id = 2 WHERE id = 1"
 
+                    connection.query("UPDATE employee SET ? WHERE  ?",[
+                        {
+                            role_id: newRoleId
+                        },
+                        {
+                            id: employeeId
 
-
-
-
-
-
+                        }], function (err, res) { 
+                            console.log('connect is good ', err, res)
+                            start()
+                        })
+                })
 
             })
       
@@ -350,19 +374,6 @@ function updateEmployeeRole() {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //test function  
 function tableData(tableName) {
