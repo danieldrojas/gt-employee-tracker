@@ -317,7 +317,6 @@ function updateEmployeeRole() {
 
                     var newRoleId;
                     for (var i = 0; i < data.length; i++){
-                        console.log('looping!!')
                         if (data[i].title === answer.roles) {
                             newRoleId = data[i].id;
                             break;
@@ -347,7 +346,6 @@ function updateEmployeeRole() {
                             id: employeeId
 
                         }], function (err, res) { 
-                            console.log('connect is good ', err, res)
                             start()
                         })
                 })

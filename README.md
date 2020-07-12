@@ -19,6 +19,11 @@ The present is a terminal application that emulates a company database allowing 
 
  Click [here](https://github.com/danieldrojas/gt-employee-tracker) to see repository
 
+ 
+![DEMO](./Assets/employee-management-system.gif) 
+
+
+
 
 
 
